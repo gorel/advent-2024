@@ -9,4 +9,4 @@ fi
 
 filename="advent/resources/day${day}.txt"
 touch "$filename"
-nvim --clean "$filename" && head -n 5 "$filename" && echo && aocd | tail -n 5
+nvim --clean "$filename" && head -n 5 "$filename" && echo && aocd "$day" 2024 | tail -n 5
