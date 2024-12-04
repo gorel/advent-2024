@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import enum
-from typing import Generic, Iterator, Tuple, TypeVar
+from typing import Callable, Generic, Iterator, Tuple, TypeVar, overload
 
 Value = TypeVar("Value")
 
@@ -181,6 +181,14 @@ class Point:
     def euclidean_dist(self, other: Point) -> float:
         return ((self.row - other.row) ** 2 + (self.col - other.col) ** 2) ** 0.5
 
+    def walk(self, direction: Direction, n: int | None = None) -> Iterator[Point]:
+        cur = self
+        steps = 0
+        while steps != n:
+            yield cur
+            cur += direction
+            steps += 1
+
     def __add__(self, other: Point | Direction | Tuple[int, int]) -> Point:
         if isinstance(other, tuple):
             return Point(self.row + other[0], self.col + other[1])
@@ -236,12 +244,31 @@ class Grid(Generic[Value]):
     def at(self, p: Point) -> Value:
         return self.g[p.row][p.col]
 
-    def at0(self, p: Point) -> Value | None:
+    @overload
+    def at0(self, p: Point, default: Value) -> Value: ...
+
+    @overload
+    def at0(self, p: Point, default: None = None) -> Value | None: ...
+
+    def at0(self, p: Point, default: Value | None = None) -> Value | None:
         if not self.inbounds(p):
-            return None
+            return default
         return self.g[p.row][p.col]
 
-    def __iter__(self) -> Iterator[tuple[Point, Value]]:
+    def where(
+        self,
+        where: Value | Callable[[Point, Value], bool],
+    ) -> Iterator[tuple[Point, Value]]:
         for row in range(self.rows):
             for col in range(self.cols):
-                yield (Point(row, col), self.g[row][col])
+                point = Point(row, col)
+                val = self.g[row][col]
+                if (
+                    where is None
+                    or val == where
+                    or (callable(where) and where(point, val))
+                ):
+                    yield point, val
+
+    def __iter__(self) -> Iterator[tuple[Point, Value]]:
+        yield from self.where(lambda _, __: True)

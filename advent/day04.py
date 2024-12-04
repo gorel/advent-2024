@@ -11,29 +11,21 @@ class Solver(BaseSolver):
         g = Grid(g=[[c for c in line] for line in self.lines])
 
         part1 = 0
-        for p, c in g:
-            if c == "X":
-                for dir in Direction:
-                    m_pt = p + dir
-                    a_pt = m_pt + dir
-                    s_pt = a_pt + dir
-                    if g.at0(m_pt) == "M" and g.at0(a_pt) == "A" and g.at0(s_pt) == "S":
-                        part1 += 1
+        for p, _ in g.where("X"):
+            for dir in Direction:
+                if all(
+                    g.at0(p2) == "XMAS"[i]
+                    for i, p2 in enumerate(p.walk(dir, len("XMAS")))
+                ):
+                    part1 += 1
+        yield part1
 
         part2 = 0
-        for p, c in g:
-            if c == "A":
-                ulc = g.at0(p + Direction.UPLEFT)
-                urc = g.at0(p + Direction.UPRIGHT)
-                dlc = g.at0(p + Direction.DOWNLEFT)
-                drc = g.at0(p + Direction.DOWNRIGHT)
-                # Find M->S going up or down on each diagonal
-                if ((ulc == "M" and drc == "S") or (ulc == "S" and drc == "M")) and (
-                    (urc == "M" and dlc == "S") or (urc == "S" and dlc == "M")
-                ):
-                    part2 += 1
-
-        yield part1
+        for p, c in g.where("A"):
+            diag1 = {c, g.at0(p + Direction.UPLEFT), g.at0(p + Direction.DOWNRIGHT)}
+            diag2 = {c, g.at0(p + Direction.UPRIGHT), g.at0(p + Direction.DOWNLEFT)}
+            if diag1 == set("MAS") and diag2 == set("MAS"):
+                part2 += 1
         yield part2
 
 
