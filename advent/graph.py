@@ -236,6 +236,11 @@ class Grid(Generic[Value]):
     def at(self, p: Point) -> Value:
         return self.g[p.row][p.col]
 
+    def at0(self, p: Point) -> Value | None:
+        if not self.inbounds(p):
+            return None
+        return self.g[p.row][p.col]
+
     def __iter__(self) -> Iterator[tuple[Point, Value]]:
         for row in range(self.rows):
             for col in range(self.cols):
