@@ -8,7 +8,7 @@ from advent.graph import Direction, Grid
 
 class Solver(BaseSolver):
     def solve(self) -> Solution:
-        g = Grid(g=[[c for c in line] for line in self.lines])
+        g = Grid.from_lines(self.lines)
 
         part1 = 0
         for p, _ in g.where("X"):

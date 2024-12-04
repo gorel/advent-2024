@@ -226,6 +226,10 @@ class Line:
 class Grid(Generic[Value]):
     g: list[list[Value]]
 
+    @staticmethod
+    def from_lines(lines: list[str]) -> Grid[str]:
+        return Grid([[c for c in line] for line in lines])
+
     @property
     def rows(self) -> int:
         return len(self.g)
