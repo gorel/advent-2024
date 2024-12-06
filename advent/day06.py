@@ -29,17 +29,13 @@ class Solver(BaseSolver):
         dir = Direction.UP
         start = pos, dir
 
-        seen = set()
+        points = {pos}
         while g.inbounds(pos):
-            if (pos, dir) in seen:
-                break
-            seen.add((pos, dir))
-            candidate = pos + dir
-            if g.at0(candidate) == "#":
+            points.add(pos)
+            if g.at0(pos + dir) == "#":
                 dir = dir.clockwise
             else:
-                pos = candidate
-        points = {p for p, _ in seen}
+                pos += dir
         yield len(points)
 
         part2 = 0
