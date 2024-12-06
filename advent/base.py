@@ -113,5 +113,9 @@ class BaseSolver(abc.ABC):
     def lines(self) -> list[str]:
         return self.data.splitlines()
 
+    @property
+    def sections(self) -> list[str]:
+        return self.data.split("\n\n")
+
     @abc.abstractmethod
     def solve(self) -> Solution: ...
