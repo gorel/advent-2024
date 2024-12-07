@@ -123,13 +123,13 @@ class Direction(enum.Enum):
     @classmethod
     def from_str(cls, s: str) -> Direction:
         match s.upper():
-            case "L" | "W" | "LEFT" | "WEST":
+            case "L" | "W" | "LEFT" | "WEST" | "<":
                 return Direction.LEFT
-            case "R" | "E" | "RIGHT" | "EAST":
+            case "R" | "E" | "RIGHT" | "EAST" | ">":
                 return Direction.RIGHT
-            case "U" | "N" | "UP" | "NORTH":
+            case "U" | "N" | "UP" | "NORTH" | "^":
                 return Direction.UP
-            case "D" | "S" | "DOWN" | "SOUTH":
+            case "D" | "S" | "DOWN" | "SOUTH" | "v":
                 return Direction.DOWN
             case "UL" | "NW" | "UPLEFT" | "NORTHWEST":
                 return Direction.UPLEFT
@@ -195,6 +195,13 @@ class Point:
         elif isinstance(other, Direction):
             return Point(self.row + other.value[0], self.col + other.value[1])
         return Point(self.row + other.row, self.col + other.col)
+
+    def __sub__(self, other: Point | Direction | Tuple[int, int]) -> Point:
+        if isinstance(other, tuple):
+            return Point(self.row - other[0], self.col - other[1])
+        elif isinstance(other, Direction):
+            return Point(self.row - other.value[0], self.col - other.value[1])
+        return Point(self.row - other.row, self.col - other.col)
 
     def __lt__(self, other: Point) -> bool:
         return (self.row, self.col) < (other.row, other.col)
@@ -276,3 +283,24 @@ class Grid(Generic[Value]):
 
     def __iter__(self) -> Iterator[tuple[Point, Value]]:
         yield from self.where(lambda _, __: True)
+
+    def __str__(self) -> str:
+        """
+        Prints a grid like so:
+          0 1 2 3
+        0 . . . .
+        1 . # . #
+        2 # . # .
+        3 . # . #
+        """
+        res = []
+        row_width = self.rows // 10 + 1
+        col_width = self.cols // 10 + 1
+        # Print header
+        col_header = "".join(f"{i:{col_width}}" for i in range(self.cols))
+        # We need to prepend the col_header with row_width spaces
+        res.append(" " * row_width + col_header)
+        for i, row in enumerate(self.g):
+            row_str = " ".join(str(x) for x in row)
+            res.append(f"{i:{row_width}} {row_str}")
+        return "\n".join(res)

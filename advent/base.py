@@ -73,14 +73,20 @@ class BaseSolver(abc.ABC):
             example_solution = cls(example_input, is_example=True).solve()
             part1 = next(example_solution)
             elapsed = time.time() - start
-            if args.part1 is not None and str(part1) != args.part1:
-                logger.fatal(f"Expected {args.part1}, but got {part1}")
-                exit(1)
+            if args.part1 is not None:
+                if str(part1) != args.part1:
+                    logger.fatal(f"Expected {args.part1}, but got {part1}")
+                    exit(1)
+                else:
+                    logger.info(green("Part1 matches expected"))
 
             part2 = next(example_solution)
-            if args.part2 is not None and str(part2) != args.part2:
-                logger.fatal(f"Expected {args.part2}, but got {part2}")
-                exit(1)
+            if args.part2 is not None:
+                if str(part2) != args.part2:
+                    logger.fatal(f"Expected {args.part2}, but got {part2}")
+                    exit(1)
+                else:
+                    logger.info(green("Part2 matches expected"))
             if args.part1 is not None or args.part2 is not None:
                 logger.info(f"Example solution matches expected (took {elapsed:.2f}s)")
         else:
