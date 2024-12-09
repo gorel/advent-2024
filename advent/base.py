@@ -13,6 +13,7 @@ from rich.console import RenderableType
 from rich.live import Live
 
 from advent.colors import blue, green
+from advent.graph import Grid
 from advent.log import ColoredLogFormatter
 
 Result = str | int
@@ -118,6 +119,14 @@ class BaseSolver(abc.ABC):
     @property
     def lines(self) -> list[str]:
         return self.data.splitlines()
+
+    @property
+    def grid(self) -> Grid[str]:
+        return Grid([[c for c in line] for line in self.lines])
+
+    @property
+    def intgrid(self) -> Grid[int]:
+        return Grid([[int(c) for c in line] for line in self.lines])
 
     @property
     def sections(self) -> list[str]:
