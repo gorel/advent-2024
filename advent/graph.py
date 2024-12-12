@@ -206,15 +206,8 @@ class Point:
     def __lt__(self, other: Point) -> bool:
         return (self.row, self.col) < (other.row, other.col)
 
-    @classmethod
-    def colinear(cls, points: list[Point]) -> bool:
-        if len(points) < 2:
-            return True
-        d = points[1] - points[0]
-        for i in range(2, len(points)):
-            if (points[i] - points[i - 1]) != d:
-                return False
-        return True
+    def colinear(self, p1: Point, p2: Point) -> bool:
+        return (self - p1) == (p2 - p1)
 
 
 @dataclasses.dataclass
