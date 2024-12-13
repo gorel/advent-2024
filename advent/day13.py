@@ -87,7 +87,9 @@ class Scenario:
         """
 
         if opt.check() == z3.sat:
-            return opt.model().evaluate(cost).as_long()
+            min_cost = opt.model().evaluate(cost)
+            assert isinstance(min_cost, z3.IntNumRef)
+            return min_cost.as_long()
         else:
             return None
 
