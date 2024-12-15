@@ -34,7 +34,7 @@ def move(grid: Grid[str], obj: tuple[Point, str], dir: Direction) -> tuple[Point
     c = grid[p]
     grid[obj[0]] = "."
     match grid[p]:
-        case "0":
+        case "O":
             move(grid, (p, c), dir)
         case "[":
             move(grid, (p, c), dir)
