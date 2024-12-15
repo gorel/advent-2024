@@ -9,8 +9,6 @@ import time
 from typing import Generator
 
 import aocd
-from rich.console import RenderableType
-from rich.live import Live
 
 from advent.colors import blue, green
 from advent.graph import Grid
@@ -19,6 +17,8 @@ from advent.log import ColoredLogFormatter
 Result = str | int
 Solution = Generator[Result | None, None, None]
 
+YEAR = 2024
+
 
 class BaseSolver(abc.ABC):
     def __init__(self, data: str, is_example: bool = False) -> None:
@@ -26,7 +26,6 @@ class BaseSolver(abc.ABC):
         self.data = data
         self.is_example = is_example
         self.is_real = not is_example
-        self.live = Live()
 
     @classmethod
     def day(cls) -> int:
@@ -41,9 +40,9 @@ class BaseSolver(abc.ABC):
     def submit(self, part1: Result | None, part2: Result | None) -> None:
         self.logger.info("Submitting answers to Advent of Code")
         if part1 is not None:
-            aocd.post.submit(part1, part="a", day=self.day(), year=2024)
+            aocd.post.submit(part1, part="a", day=self.day(), year=YEAR)  # pyright: ignore
         if part2 is not None:
-            aocd.post.submit(part2, part="b", day=self.day(), year=2024)
+            aocd.post.submit(part2, part="b", day=self.day(), year=YEAR)  # pyright: ignore
 
     @classmethod
     def run(cls) -> None:
@@ -93,7 +92,7 @@ class BaseSolver(abc.ABC):
         else:
             logger.warning("No example input found")
 
-        data = aocd.get_data(day=cls.day(), year=2024)
+        data = aocd.get_data(day=cls.day(), year=YEAR)
         solver = cls(data)
         start = time.time()
         solution = solver.solve()
@@ -112,9 +111,6 @@ class BaseSolver(abc.ABC):
 
         if not args.no_submit:
             solver.submit(part1, part2)
-
-    def show_state(self, state: RenderableType) -> None:
-        self.live.update(state)
 
     @property
     def lines(self) -> list[str]:

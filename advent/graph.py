@@ -277,7 +277,7 @@ class Grid(Generic[Value]):
 
     def where(
         self,
-        where: Value | Callable[[Point, Value], bool],
+        where: Value | Callable[[Point, Value], bool] | None,
     ) -> Iterator[tuple[Point, Value]]:
         for row in range(self.rows):
             for col in range(self.cols):
@@ -291,7 +291,7 @@ class Grid(Generic[Value]):
                     yield point, val
 
     def __iter__(self) -> Iterator[tuple[Point, Value]]:
-        yield from self.where(lambda _, __: True)
+        yield from self.where(None)
 
     def __str__(self) -> str:
         """
@@ -313,3 +313,6 @@ class Grid(Generic[Value]):
             row_str = " ".join(str(x) for x in row)
             res.append(f"{i:{row_width}} {row_str}")
         return "\n".join(res)
+
+    def short_str(self) -> str:
+        return "\n".join("".join(str(x) for x in row) for row in self.g)

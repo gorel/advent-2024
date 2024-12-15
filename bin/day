@@ -14,4 +14,4 @@ if [ ! -f "$filename" ]; then
 	cp template.py "$filename"
 fi
 
-nvim "$filename"
+nvim "$filename" "advent/graph.py"
