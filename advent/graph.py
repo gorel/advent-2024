@@ -129,7 +129,7 @@ class Direction(enum.Enum):
                 return Direction.RIGHT
             case "U" | "N" | "UP" | "NORTH" | "^":
                 return Direction.UP
-            case "D" | "S" | "DOWN" | "SOUTH" | "v":
+            case "D" | "S" | "DOWN" | "SOUTH" | "V":
                 return Direction.DOWN
             case "UL" | "NW" | "UPLEFT" | "NORTHWEST":
                 return Direction.UPLEFT
@@ -257,6 +257,12 @@ class Grid(Generic[Value]):
 
     def at(self, p: Point) -> Value:
         return self.g[p.row][p.col]
+
+    def __getitem__(self, p: Point) -> Value:
+        return self.g[p.row][p.col]
+
+    def __setitem__(self, p: Point, val: Value) -> None:
+        self.g[p.row][p.col] = val
 
     @overload
     def at0(self, p: Point, default: Value) -> Value: ...
