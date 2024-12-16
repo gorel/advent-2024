@@ -5,6 +5,7 @@ import enum
 from typing import Callable, Generic, Iterator, Tuple, TypeVar, overload
 
 Value = TypeVar("Value")
+Value2 = TypeVar("Value2")
 
 
 class Direction(enum.Enum):
@@ -119,6 +120,9 @@ class Direction(enum.Enum):
     @property
     def opposite(self) -> Direction:
         return self.clockwise.clockwise
+
+    def __lt__(self, other: Direction) -> bool:
+        return (self.value[0], self.value[1]) < (other.value[0], other.value[1])
 
     @classmethod
     def from_str(cls, s: str) -> Direction:
