@@ -294,6 +294,14 @@ class Grid(Generic[Value]):
                 ):
                     yield point, val
 
+    def transform(self, f: Callable[[Point, Value], Value2]) -> Grid[Value2]:
+        return Grid(
+            [
+                [f(Point(i, j), val) for j, val in enumerate(row)]
+                for i, row in enumerate(self.g)
+            ]
+        )
+
     def __iter__(self) -> Iterator[tuple[Point, Value]]:
         yield from self.where(None)
 
