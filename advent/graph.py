@@ -4,6 +4,8 @@ import dataclasses
 import enum
 from typing import Callable, Generic, Iterator, Tuple, TypeVar, overload
 
+import networkx as nx
+
 Value = TypeVar("Value")
 Value2 = TypeVar("Value2")
 
@@ -160,6 +162,9 @@ class Point:
     def y(self) -> int:
         return self.col
 
+    def tuple(self) -> tuple[int, int]:
+        return self.row, self.col
+
     def move(self, direction: Direction) -> Point:
         return self + direction
 
@@ -178,6 +183,24 @@ class Point:
     def adjacent8_with_dirs(self) -> Iterator[tuple[Point, Direction]]:
         for d in Direction:
             yield (self + d, d)
+
+    def all_adjacent_within(self, n: int, include_diagonal: bool = False) -> Iterator[Point]:
+        seen = set()
+        s: list[tuple[Point, int]] = [(self, 0)]
+        while s:
+            cur, dist = s.pop()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            # Intentionally don't yield the initial point since a point isn't 
+            # really adjacent to itself
+            if cur != self:
+                yield cur
+
+            adj_iter = cur.adjacent8() if include_diagonal else cur.adjacent()
+            for adj in adj_iter:
+                if adj not in seen and dist+1 <= n:
+                    s.append((adj, dist+1))
 
     def manhattan_dist(self, other: Point) -> int:
         return abs(self.row - other.row) + abs(self.col - other.col)
@@ -239,6 +262,7 @@ class Line:
 @dataclasses.dataclass
 class Grid(Generic[Value]):
     g: list[list[Value]]
+    _modified: bool = False
 
     @staticmethod
     def from_lines(lines: list[str]) -> Grid[str]:
@@ -261,6 +285,16 @@ class Grid(Generic[Value]):
 
     def at(self, p: Point) -> Value:
         return self.g[p.row][p.col]
+
+    def adjacent(self, p: Point) -> Iterator[tuple[Point, Value]]:
+        for p2 in p.adjacent():
+            if self.inbounds(p2):
+                yield p2, self.at(p2)
+
+    def adjacent8(self, p: Point) -> Iterator[tuple[Point, Value]]:
+        for p2 in p.adjacent8():
+            if self.inbounds(p2):
+                yield p2, self.at(p2)
 
     def __getitem__(self, p: Point) -> Value:
         return self.g[p.row][p.col]
@@ -301,6 +335,18 @@ class Grid(Generic[Value]):
                 for i, row in enumerate(self.g)
             ]
         )
+
+    def to_nx_graph(self, edge_exists: Callable[[tuple[Point, Value], tuple[Point, Value]], bool] | None = None) -> nx.Graph:
+        if edge_exists is None:
+            def f(p0: tuple[Point, Value], p1: tuple[Point, Value]) -> bool:
+                return p0[1] != "#" and p1[1] != "#"
+            edge_exists = f
+        res = nx.Graph()
+        for p, c in self:
+            for neighbor in self.adjacent(p):
+                if edge_exists((p, c), neighbor):
+                    res.add_edge(p, neighbor[0])
+        return res
 
     def __iter__(self) -> Iterator[tuple[Point, Value]]:
         yield from self.where(None)
